@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'AWS Cloudformation Homework Template vpc-setup.yaml This template shows an example of a VPC with Public and Private Subnets, Route Table, NAT Gateway, Internet Gateway, and prints and Output of the VPC ID, EC2 Public IP, and Public Subnet IDs'
+Parameters:
+  EnvNameParam:
+    Description: 'Determines which settings are passed to userdata'
+    Type: String
+    Default: 'dev'
+    AllowedValues:
+     - 'dev'
+     - 'test'
+  InstanceTypeParam:
+    Description: 'Enter a valid instance type for the selected region'
+    Type: String
+    Default: 't2.micro'
+  VpcCidrBlock:
+    Type: String
+    Default: '10.0.0.0/16'
+    Description: 'CIDR Block for VPC'
+  PublicSubnetCidrBlock:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: 'CIDR Block for the Public Subnet'
+  PrivateSubnetCidrBlock:
+    Type: String
+    Default: '10.0.1.0/24'
+    Description: 'CIDR Block for the Private Subnet'
+
+Mappings:
+  EnvMap:
+    dev: 
+      UserToCreate: 'devuser'
+      WebServer: httpd
+    test: 
+      UserToCreate: 'testuser'
+      WebServer: nginx
+
+Conditions:
+  IfDev:
+    fn::Equals:
+      - Ref: EnvNameParam
+      - 'dev'
+
+Resources:
+  MyVPC:
+    Type: 'AWS::EC2::VPC'
+    Properties:
+      CidrBlock: VpcCidrBlock
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: 'Name'
+          Value: 'MyVPC'
